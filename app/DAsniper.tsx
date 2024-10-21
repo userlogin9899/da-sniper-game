@@ -245,4 +245,163 @@ export default function DASniper() {
     <div ref={containerRef} className={`relative w-full h-screen bg-gray-900 overflow-hidden ${!gameStarted || showWinMessage ? '' : 'cursor-none'}`}>
       <audio
         ref={audioRef}
-        
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mchammer-EoflBCFwAiTGe1hecswL1vuqgDLVG9.mp3"
+        loop
+      />
+      <audio
+        ref={instrumentalRef}
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/intstrumental-pye6EVhTzsIwmavS8xb9WNuwBwO1JX.mp3"
+        loop
+      />
+      {!gameStarted ? (
+        <div className="flex flex-col items-center justify-center h-full">
+          <h1 className="text-4xl font-bold text-white mb-8">DA Sniper</h1>
+          <button
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105"
+            onClick={startGame}
+          >
+            Play
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="absolute top-4 left-4 text-white text-xl font-bold">
+            Level: {level}
+          </div>
+          <motion.div
+            className="absolute w-[150px] h-[150px] rounded-2xl shadow-lg"
+            style={{
+              backgroundImage: "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DA-Logo-v1-STK_C-fvOGs1sBh0UtSgHL9DjSIHAmSIq7d5.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+            animate={{
+              x: position.x - 75,
+              y: position.y - 75,
+              transition: { type: "spring", stiffness: 800 + (level * 50), damping: 15 - (level * 0.5) }
+            }}
+            whileHover={{ scale: 1.1, rotate: [0, -10, 10, -10, 10, 0] }}
+          >
+            <motion.div
+              className="absolute inset-0 rounded-2xl"
+              animate={{
+                boxShadow: [
+                  '0 0 20px 8px rgba(0, 255, 255, 0.7)',
+                  '0 0 25px 12px rgba(255, 105, 180, 0.7)',
+                  '0 0 20px 8px rgba(0, 255, 255, 0.7)',
+                ],
+              }}
+              transition={{
+                duration: 0.5 - (level * 0.02),
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            />
+            {showTaunt && (
+              <motion.div
+                className="absolute top-[-80px] left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white px-4 py-2 rounded-lg text-sm font-bold w-64 text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                style={{
+                  boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
+                  zIndex: 1000,
+                }}
+              >
+                {currentTaunt}
+              </motion.div>
+            )}
+          </motion.div>
+          
+          {!showWinMessage && (
+            <div 
+              className={`cursor ${isNearCenter ? 'sniper-scope' : 'point'}`}
+              style={{
+                position: 'fixed',
+                left: `${cursorPosition.x}px`,
+                top: `${cursorPosition.y}px`,
+                width: isNearCenter ? '60px' : '10px',
+                height: isNearCenter ? '60px' : '10px',
+                pointerEvents: 'none',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 9999,
+              }}
+            >
+              {!isNearCenter && (
+                <div 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '50%',
+                  }}
+                />
+              )}
+              {isNearCenter && (
+                <svg width="60" height="60" viewBox="0 0 60 60">
+                  <circle cx="30" cy="30" r="28" stroke="#00FF00" strokeWidth="2" fill="none" />
+                  <line x1="0" y1="30" x2="60" y2="30" stroke="#00FF00" strokeWidth="1" />
+                  <line x1="30" y1="0" x2="30" y2="60" stroke="#00FF00" strokeWidth="1" />
+                  <circle cx="30" cy="30" r="2" fill="#00FF00" />
+                </svg>
+              )}
+            </div>
+          )}
+          {showWaterPistol && (
+            <motion.div
+              className="fixed bottom-4 right-4 bg-blue-500 p-2 rounded-full cursor-pointer z-50"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleWaterPistolClick}
+              style={{ pointerEvents: 'auto' }}
+            >
+              <Droplets size={24} color="white" />
+            </motion.div>
+          )}
+          {showWinMessage && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+              <div className="bg-white p-8 rounded-lg text-center">
+                <h2 className="text-3xl font-bold mb-4">Level {level} Completed!</h2>
+                <button
+                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105"
+                  onClick={handleNextLevel}
+                >
+                  Next Level
+                </button>
+              </div>
+            </div>
+          )}
+          <button
+            className="fixed top-4 right-4 bg-gray-800 p-2 rounded-full cursor-pointer z-50"
+            onClick={toggleMusic}
+            style={{ pointerEvents: 'auto' }}
+          >
+            {isMusicPlaying ? (
+              <Volume2 size={24} color="white" />
+            ) : (
+              <VolumeX size={24} color="white" />
+            )}
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={audioRef.current?.volume || 1}
+            onChange={(e) => {
+              const volume = parseFloat(e.target.value)
+              if (audioRef.current) audioRef.current.volume = volume
+              if (instrumentalRef.current) instrumentalRef.current.volume = volume
+            }}
+            className="fixed top-16 right-4 w-32 z-50"
+          />
+        </>
+      )}
+      <style jsx global>{`
+        body {
+          cursor: ${!gameStarted || showWinMessage ? 'default' : 'none'};
+        }
+      `}</style>
+    </div>
+  )
+}
